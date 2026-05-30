@@ -1,13 +1,23 @@
 'use strict';
 
 const projectTitle = document.getElementsByTagName('h1')[0];
-const handlerBtn = document.getElementsByClassName('handler_btn');
+
+const handlerBtn = document.getElementsByClassName('handler_btn')[0];
+const resetBtn = document.getElementsByClassName('handler_btn')[1];
 const addBtn = document.querySelector('.screen-btn');
+
 const percentItems = document.querySelectorAll('.other-items.percent');
 const numberItems = document.querySelectorAll('.other-items.number');
+
 const inputRange = document.querySelector('.rollback input[type="range"]');
 const rangeValue = document.querySelector('.rollback .range-value');
-const totalInputs = document.getElementsByClassName('total-input');
+
+const totalInputs = document.getElementsByClassName('total-input')[0];
+const totalCount = document.getElementsByClassName('total-input')[1];
+const totalCountOther = document.getElementsByClassName('total-input')[2];
+const fullTotalCount = document.getElementsByClassName('total-input')[3];
+const totalCountRollback = document.getElementsByClassName('total-input')[4];
+
 const elementsArray = [];
 for (let i = 0; i < totalInputs.length; i++) {
   elementsArray.push(totalInputs[i]);
@@ -24,25 +34,44 @@ const appData = {
   servicePercentPrice: 0,
   allServicePrices: 0,
   services: {},
+  init: function () {
+    appData.addTitle()
+    handlerBtn.addEventListener('click', appData.start)
+    addBtn.addEventListener('click', appData.addScreenBlock)
+  },
+  addTitle: function () {
+    document.title = projectTitle.textContent
+  },
 
   start: function () {
-    appData.asking();
-    appData.addPrices();
-    appData.getFullPrice();
-    appData.getServicePercentPrices();
-    appData.getTitle();
-    appData.logger();
+    appData.addScreens()
+    // appData.asking();
+    // appData.addPrices();
+    // appData.getFullPrice();
+    // appData.getServicePercentPrices();
+    // appData.getTitle();
+    // appData.logger();
+  },
+  addScreens: function () {
+    screenType.forEach(function (screen, index) {
+      const select = screen.querySelector('select')
+      const input = screen.querySelector('input')
+      const selectName = select.options[select.selectedIndex].textContent
+
+      appData.screens.push({
+        id: index,
+        name: selectName,
+        price: +select.value * +input.value
+      });
+    })
+  },
+  addScreenBlock: function () {
+    const cloneScreen = screenType[0].cloneNode(true)
+    screenType[screenType.length - 1].after(cloneScreen)
   },
 
   asking: function () {
-    appData.title = appData.getTextAnswer("Как называется ваш проект?", "Калькулятор верстки");
 
-    for (let i = 0; i < 2; i++) {
-      let name = appData.getTextAnswer("Какие типы экранов нужно разработать?");
-      let price = appData.getNumberAnswer("Сколько будет стоить данная работа?");
-
-      appData.screens.push({ id: i, name: name, price: price });
-    }
 
     for (let i = 0; i < 2; i++) {
       let name = appData.getTextAnswer("Какой дополнительный тип услуги нужен?");
@@ -51,7 +80,6 @@ const appData = {
       appData.services[name] = servicePrice;
     }
 
-    appData.adaptive = confirm("Нужен ли адаптив на сайте?");
   },
 
   getTextAnswer: function (question, defaultValue = '') {
@@ -83,9 +111,7 @@ const appData = {
     return isNaN(+str) || /\D/.test(str);
   },
 
-  isNumber: function (num) {
-    return /^\d+$/.test(num);
-  },
+
 
   addPrices: function () {
     for (let screen of appData.screens) {
@@ -135,4 +161,4 @@ const appData = {
   },
 };
 
-appData.start();
+appData.init();
