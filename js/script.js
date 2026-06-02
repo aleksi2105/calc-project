@@ -46,6 +46,10 @@ const appData = {
   },
 
   start: function () {
+    if (!appData.validateScreens()) {
+      alert('Пожалуйста, заполните все блоки с экранами: выберите тип и укажите количество.');
+      return;
+    }
     appData.addScreens()
     appData.addServices()
     appData.addPrices();
@@ -53,6 +57,25 @@ const appData = {
     // appData.logger();
     appData.showResult()
   },
+
+  validateScreens: function () {
+    const currentScreens = document.querySelectorAll('.screen');
+
+    for (let screen of currentScreens) {
+      const select = screen.querySelector('select');
+      const input = screen.querySelector('input[type="text"]');
+
+      const isSelectValid = select && select.value !== '';
+      const isInputValid = input && input.value.trim() !== '' && !isNaN(+input.value.trim()) && +input.value.trim() > 0;
+
+      if (!isSelectValid || !isInputValid) {
+        return false;
+      }
+    }
+
+    return currentScreens.length > 0;
+  },
+
   showResult: function () {
     totalInputs.value = appData.screenPrice
     totalCountOther.value = appData.servicePricesPercent + appData.servicePricesNumber
