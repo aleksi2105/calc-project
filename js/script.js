@@ -104,7 +104,7 @@ const appData = {
   addScreens: function () {
     let screenType = document.querySelectorAll('.screen');
 
-    screenType.forEach(function (screen, index) {
+    screenType.forEach((screen, index) => {
       const select = screen.querySelector('select')
       const input = screen.querySelector('input')
       const selectName = select.options[select.selectedIndex].textContent
@@ -121,7 +121,7 @@ const appData = {
 
   },
   addServices: function () {
-    percentItems.forEach(function (item) {
+    percentItems.forEach((item) => {
       const check = item.querySelector('input[type=checkbox]')
       const label = item.querySelector('label')
       const input = item.querySelector('input[type=text]')
@@ -132,7 +132,7 @@ const appData = {
 
     })
 
-    numberItems.forEach(function (item) {
+    numberItems.forEach((item) => {
       const check = item.querySelector('input[type=checkbox]')
       const label = item.querySelector('label')
       const input = item.querySelector('input[type=text]')
