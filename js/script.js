@@ -37,10 +37,16 @@ const appData = {
   servicesPercent: {},
   servicesNumber: {},
   totalScreensCount: 0,
+  originalPlaceholders: {},
   init: function () {
     this.addTitle()
+    this.saveOriginalPlaceholders()
     handlerBtn.addEventListener('click', this.start.bind(this))
+    resetBtn.addEventListener('click', this.reset.bind(this))
     addBtn.addEventListener('click', this.addScreenBlock.bind(this))
+
+
+    resetBtn.style.display = 'none'
 
 
     if (inputRange) {
@@ -49,6 +55,62 @@ const appData = {
   },
   addTitle: function () {
     document.title = projectTitle.textContent
+  },
+
+  saveOriginalPlaceholders: function () {
+    this.originalPlaceholders = {};
+    const screenInputs = document.querySelectorAll('.screen input[type="text"]');
+    screenInputs.forEach((input, index) => {
+      const key = `screen_input_${index}`;
+      // Сохраняем value, а не placeholder
+      this.originalPlaceholders[key] = input.value;
+    });
+
+    percentItems.forEach((item, index) => {
+      const input = item.querySelector('input[type="text"]');
+      if (input) {
+        const key = `percent_input_${index}`;
+        this.originalPlaceholders[key] = input.value;
+      }
+    });
+
+    numberItems.forEach((item, index) => {
+      const input = item.querySelector('input[type="text"]');
+      if (input) {
+        const key = `number_input_${index}`;
+        this.originalPlaceholders[key] = input.value;
+      }
+    });
+  },
+
+  restoreOriginalPlaceholders: function () {
+    const screenInputs = document.querySelectorAll('.screen input[type="text"]');
+    screenInputs.forEach((input, index) => {
+      const key = `screen_input_${index}`;
+      if (this.originalPlaceholders[key] !== undefined) {
+        input.value = this.originalPlaceholders[key];
+      }
+    });
+
+    percentItems.forEach((item, index) => {
+      const input = item.querySelector('input[type="text"]');
+      if (input) {
+        const key = `percent_input_${index}`;
+        if (this.originalPlaceholders[key] !== undefined) {
+          input.value = this.originalPlaceholders[key];
+        }
+      }
+    });
+
+    numberItems.forEach((item, index) => {
+      const input = item.querySelector('input[type="text"]');
+      if (input) {
+        const key = `number_input_${index}`;
+        if (this.originalPlaceholders[key] !== undefined) {
+          input.value = this.originalPlaceholders[key];
+        }
+      }
+    });
   },
 
   start: function () {
@@ -63,9 +125,149 @@ const appData = {
     this.addPrices();
     // this.logger();
     this.showResult()
+    this.disableInputs()
+    this.switchButtons()
   },
 
+  reset: function () {
+    this.screens = [];
+    this.screenPrice = 0;
+    this.rollBack = 0;
+    this.fullPrice = 0;
+    this.servicePercentPrice = 0;
+    this.servicePricesNumber = 0;
+    this.servicePricesPercent = 0;
+    this.servicesPercent = {};
+    this.servicesNumber = {};
+    this.totalScreensCount = 0;
+
+    if (totalInputs) totalInputs.value = '';
+    if (totalCount) totalCount.value = '';
+    if (totalCountOther) totalCountOther.value = '';
+    if (fullTotalCount) fullTotalCount.value = '';
+    if (totalCountRollback) totalCountRollback.value = '';
+
+    const screens = document.querySelectorAll('.screen');
+    for (let i = screens.length - 1; i > 0; i--) {
+      screens[i].remove();
+    }
+
+    const firstScreen = document.querySelector('.screen');
+    if (firstScreen) {
+      const firstSelect = firstScreen.querySelector('select');
+      const firstInput = firstScreen.querySelector('input[type="text"]');
+      if (firstSelect) firstSelect.value = '';
+      if (firstInput) {
+        firstInput.value = '';
+      }
+    }
+
+
+    percentItems.forEach((item, index) => {
+      const check = item.querySelector('input[type=checkbox]');
+      const input = item.querySelector('input[type=text]');
+      if (check) check.checked = false;
+      if (input) {
+        input.value = '';
+      }
+    });
+
+    numberItems.forEach((item, index) => {
+      const check = item.querySelector('input[type=checkbox]');
+      const input = item.querySelector('input[type=text]');
+      if (check) check.checked = false;
+      if (input) {
+        input.value = '';
+      }
+    });
+
+    if (inputRange) {
+      inputRange.value = '0';
+      if (rangeValue) {
+        rangeValue.textContent = '0%';
+      }
+    }
+    this.enableInputs();
+    this.restoreOriginalPlaceholders();
+    this.switchButtons();
+  },
+
+  disableInputs: function () {
+
+    const allSelects = document.querySelectorAll('.screen select');
+    allSelects.forEach(select => {
+      select.disabled = true;
+    });
+
+    const allTextInputs = document.querySelectorAll('.screen input[type="text"]');
+    allTextInputs.forEach(input => {
+      input.disabled = true;
+    });
+
+    const allServiceChecks = document.querySelectorAll('.other-items input[type="checkbox"]');
+    allServiceChecks.forEach(checkbox => {
+      checkbox.disabled = true;
+    });
+
+    const allServiceInputs = document.querySelectorAll('.other-items input[type="text"]');
+    allServiceInputs.forEach(input => {
+      input.disabled = true;
+    });
+
+    if (inputRange) {
+      inputRange.disabled = true;
+    }
+
+    if (addBtn) {
+      addBtn.disabled = true;
+    }
+  },
+
+  enableInputs: function () {
+
+    const allSelects = document.querySelectorAll('.screen select');
+    allSelects.forEach(select => {
+      select.disabled = false;
+    });
+
+
+    const allTextInputs = document.querySelectorAll('.screen input[type="text"]');
+    allTextInputs.forEach(input => {
+      input.disabled = false;
+    });
+
+    const allServiceChecks = document.querySelectorAll('.other-items input[type="checkbox"]');
+    allServiceChecks.forEach(checkbox => {
+      checkbox.disabled = false;
+    });
+
+    const allServiceInputs = document.querySelectorAll('.other-items input[type="text"]');
+    allServiceInputs.forEach(input => {
+      input.disabled = false;
+    });
+
+    if (inputRange) {
+      inputRange.disabled = false;
+    }
+
+    if (addBtn) {
+      addBtn.disabled = false;
+    }
+  },
+
+  switchButtons: function () {
+    if (handlerBtn.style.display === 'none') {
+      handlerBtn.style.display = '';
+      resetBtn.style.display = 'none';
+    } else {
+      handlerBtn.style.display = 'none';
+      resetBtn.style.display = '';
+    }
+  },
+
+
   updateRollbackValue: function (event) {
+    if (inputRange && inputRange.disabled) return;
     const value = event.target.value;
 
     if (rangeValue) {
@@ -146,8 +348,23 @@ const appData = {
 
 
   addScreenBlock: function () {
+    if (addBtn && addBtn.disabled) return;
+
     const cloneScreen = screenType[0].cloneNode(true)
+    const cloneSelect = cloneScreen.querySelector('select');
+    const cloneInput = cloneScreen.querySelector('input[type="text"]');
+    if (cloneSelect) cloneSelect.value = '';
+    if (cloneInput) {
+      cloneInput.value = '';
+      const newIndex = document.querySelectorAll('.screen').length;
+      const key = `screen_input_${newIndex}`;
+      if (this.originalPlaceholders) {
+        this.originalPlaceholders[key] = cloneInput.placeholder;
+      }
+    }
+
     screenType[screenType.length - 1].after(cloneScreen)
+    screenType = document.querySelectorAll('.screen');
   },
 
 
@@ -180,8 +397,6 @@ const appData = {
     if (!str) return false;
     return isNaN(+str) || /\D/.test(str);
   },
-
-
 
   addPrices: function () {
     this.screenPrice = 0;
