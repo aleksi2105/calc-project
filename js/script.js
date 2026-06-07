@@ -162,24 +162,18 @@ const appData = {
       }
     }
 
+    const clearItems = (items) => {
+      items.forEach((item, index) => {
+        const check = item.querySelector('input[type="checkbox"]');
+        const input = item.querySelector('input[type="text"]');
+        if (check) check.checked = false;
+        if (input) {
+          input.value = '';
+        }
+      });
+    };
 
-    percentItems.forEach((item, index) => {
-      const check = item.querySelector('input[type=checkbox]');
-      const input = item.querySelector('input[type=text]');
-      if (check) check.checked = false;
-      if (input) {
-        input.value = '';
-      }
-    });
 
-    numberItems.forEach((item, index) => {
-      const check = item.querySelector('input[type=checkbox]');
-      const input = item.querySelector('input[type=text]');
-      if (check) check.checked = false;
-      if (input) {
-        input.value = '';
-      }
-    });
 
     if (inputRange) {
       inputRange.value = '0';
@@ -187,6 +181,9 @@ const appData = {
         rangeValue.textContent = '0%';
       }
     }
+    clearItems(percentItems);
+    clearItems(numberItems);
+
     this.enableInputs();
     this.restoreOriginalPlaceholders();
     this.switchButtons();
